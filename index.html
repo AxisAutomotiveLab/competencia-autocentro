@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Competencia | Autocentro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F5F7;--card:#fff;--ink:#1B1F24;--mut:#6B7280;--line:#E5E7EB;--acc:#B3122E;--ok:#1E7F4F;--okbg:#E6F4EC;--warn:#B45309;--warnbg:#FEF3E2;--meta:#1877F2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Arial,sans-serif;font-size:14px}
+header{background:#1B1F24;color:#fff;padding:18px 24px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:18px;font-weight:600}header .sub{font-size:12px;color:#B8BEC7;margin-top:2px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{border:1px solid #3A414B;background:transparent;color:#E5E7EB;padding:7px 14px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer}
+.tab.on{background:#fff;color:#1B1F24;border-color:#fff;font-weight:600}
+.wrap{max-width:1400px;margin:0 auto;padding:20px 24px 40px}
+.views{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px;width:fit-content;max-width:100%;flex-wrap:wrap}
+.view{border:0;background:transparent;padding:10px 16px;border-radius:9px;font:inherit;font-weight:600;color:var(--mut);cursor:pointer;display:flex;gap:8px;align-items:center}
+.view.on{background:var(--ink);color:#fff}.view .n{background:#EEF0F3;color:var(--ink);border-radius:999px;padding:1px 8px;font-size:12px}.view.on .n{background:#3A414B;color:#fff}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.f{display:flex;flex-direction:column;gap:4px}.f label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+select,input{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}.kpi .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:26px;font-weight:700;margin-top:6px}.kpi .s{font-size:12px;color:var(--mut);margin-top:2px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.card h3{margin:0 0 4px;font-size:14px}.card .hint{font-size:12px;color:var(--mut);margin-bottom:12px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:600}
+td{padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;white-space:nowrap;vertical-align:middle}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.mod td{background:#F3F4F6;font-weight:700}.us td{background:#FFF8F8}.muted{color:#9CA3AF}.hide{display:none}
+.best{background:var(--okbg);color:var(--ok);font-weight:700;border-radius:6px;padding:2px 6px}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600}.up{background:#FBE9EC;color:var(--acc)}.down{background:var(--okbg);color:var(--ok)}.eq{background:#F3F4F6;color:var(--mut)}.mid{background:#FDE7C7;color:#9A4A00}
+tr.r-g td{background:#E6F4EC}tr.r-o td{background:#FFF1DC}tr.r-r td{background:#FBE3E7}
+tr.r-g td:first-child{box-shadow:inset 4px 0 #1E7F4F}tr.r-o td:first-child{box-shadow:inset 4px 0 #D97706}tr.r-r td:first-child{box-shadow:inset 4px 0 #B3122E}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-bottom:10px}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.u{display:block;font-size:11px;color:var(--mut);font-weight:500}.top{font-weight:800}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:12px;font-weight:700;border-radius:8px;padding:6px 10px;white-space:nowrap;border:0;cursor:pointer;font-family:inherit}
+.btn.meta{background:var(--meta);color:#fff}.btn.web{background:var(--ink);color:#fff}
+.veh{white-space:normal;min-width:200px}.veh .u{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
+.thumb{width:56px;height:42px;object-fit:cover;border-radius:6px;background:#F3F4F6;display:block}
+.dias{font-weight:700}.dias.old{color:var(--acc)}
+.tag{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap;display:inline-block;margin:2px 0}.new{background:var(--acc);color:#fff}.ver{background:var(--warnbg);color:var(--warn)}.date{background:#F3F4F6;color:var(--mut)}.ours-tag{background:var(--acc);color:#fff}.oferta{background:var(--okbg);color:var(--ok)}
+.ads{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.ad{background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}.ad.ours{border:2px solid var(--acc)}
+.ad .img{height:150px;background:#F3F4F6 center/cover no-repeat}.ad .b{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.ad .d{font-size:12px;color:var(--mut);font-weight:600}.ad .m{font-weight:700;font-size:15px}.ad .o{font-size:13px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:12px;font-weight:700;border-radius:6px;padding:3px 8px;background:#F3F4F6}
+.chip.pay{background:#FBE9EC;color:var(--acc)}.chip.apr{background:#E8F0FE;color:#1F4E8C}.chip.bono{background:var(--okbg);color:var(--ok)}
+.small{font-size:12px;color:var(--mut);background:#F9FAFB;border-left:3px solid #D1D5DB;padding:6px 8px;border-radius:0 6px 6px 0}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:6px;flex-wrap:wrap}
+.mesh{grid-column:1/-1;font-weight:700;font-size:14px;margin:10px 0 2px;display:flex;gap:8px;align-items:center}.mesh span{font-weight:500;color:var(--mut);font-size:12px}
+.dates{display:flex;gap:4px;flex-wrap:wrap}.tag.vig{background:#E6F4EC;color:#1E7F4F}.tag.cad{background:#FBE3E7;color:#B3122E}.tag.term{background:#E5E7EB;color:#4B5563}.ad.old{opacity:.8}.ad.old .img{filter:grayscale(.6)}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--mut)}
+.pager button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;color:var(--ink)}
+.pager button:disabled{opacity:.4;cursor:default}.pager b{color:var(--ink);margin:0 6px}
+td.que{white-space:normal;min-width:220px;max-width:380px}
+.empty{padding:40px 20px;text-align:center;color:var(--mut)}
+#loading{padding:80px 20px;text-align:center;color:var(--mut)}
+@media(max-width:700px){.wrap{padding:16px}}
+</style></head><body>
+<header><div><h1>Competencia · Ofertas y Precios</h1><div class="sub" id="upd">Cargando…</div></div><div class="tabs" id="marcas"></div></header>
+<div class="wrap">
+ <div id="loading">Cargando datos de la competencia…</div>
+ <div id="app" class="hide">
+ <div class="views" id="views">
+  <button class="view on" data-v="res">🏆 Resumen</button>
+  <button class="view" data-v="meta">📣 Ofertas en Meta <span class="n" id="nMeta"></span></button>
+  <button class="view" data-v="web">🌐 Ofertas en websites <span class="n" id="nWeb"></span></button>
+  <button class="view" data-v="inv">📦 Inventario</button>
+  <button class="view" data-v="cmp">⚖️ Comparativo de precios</button>
+  <button class="view" data-v="cam">🔔 Cambios <span class="n" id="nCam"></span></button>
+ </div>
+ <div class="filters">
+  <div class="f" id="bDeal"><label>Dealer</label><select id="fDeal"></select></div>
+  <div class="f"><label>Modelo</label><select id="fMod"></select></div>
+  <div class="f" id="bTipo"><label>Tipo de oferta</label><select id="fTipo"><option value="">Todas</option><option value="5">Pago mensual</option><option value="7">Tasa (APR)</option><option value="8">Bono</option><option value="6">Precio</option></select></div>
+  <div class="f" id="bEst"><label>Estado</label><select id="fEst"><option value="act" selected>Activos (vigentes + caducados)</option><option value="vig">Solo vigentes</option><option value="cad">Caducados (oferta vencida, anuncio sigue)</option><option value="term">Terminados (ya no aparecen)</option><option value="">Todos</option></select></div>
+  <div class="f" id="bMes"><label>Mes publicado</label><select id="fMes"><option value="">Todos</option></select></div>
+  <div class="f" id="bOrd"><label>Ordenar</label><select id="fOrd"><option value="new">Más recientes</option><option value="pay">Pago más bajo</option></select></div>
+  <div class="f" style="flex:1;min-width:180px"><label>Buscar</label><input id="q" placeholder="Modelo, oferta, VIN, color…"></div>
+  <div class="f"><label>&nbsp;</label><button class="btn web" id="csv" style="padding:9px 12px">⬇ Exportar a Excel</button></div>
+ </div>
+ <div class="kpis" id="kpis"></div>
+ <div id="vRes"><div class="card"><h3>Mejor oferta por modelo</h3><div class="hint">Lo mejor que anuncia la competencia en Meta y publica en su website, junto a lo nuestro.</div><div class="tw"><table id="tRes"></table></div></div></div>
+ <div id="vMeta" class="hide"><div class="ads" id="ads"></div><div class="pager" id="pgMeta"></div></div>
+ <div id="vWeb" class="hide"><div class="card"><h3>Vehículos publicados en los websites</h3><div class="hint">Cada fila abre la página de ese vehículo. En verde: el precio más bajo de ese sub-modelo entre todos los dealers. Días publicado en rojo: 60 o más.</div><div class="tw"><table id="tWeb"></table></div><div class="pager" id="pgWeb"></div></div></div>
+ <div id="vInv" class="hide"><div class="card"><h3>Unidades nuevas publicadas por modelo</h3><div class="hint">La fila gris es el total del modelo; debajo, cada sub-modelo. En negrita: quién tiene más.</div><div class="tw"><table id="tInv"></table></div></div></div>
+ <div id="vCmp" class="hide"><div class="card"><h3>Precio más bajo por sub-modelo (websites)</h3><div class="hint">La diferencia compara nuestro precio más bajo con el del competidor más barato.</div>
+  <div class="legend"><span><i style="background:#1E7F4F"></i>Bajo: somos los más baratos o iguales</span><span><i style="background:#D97706"></i>Medio: hasta $500 más caros</span><span><i style="background:#B3122E"></i>Alto: más de $500 más caros</span><span><i style="background:#E5E7EB"></i>Sin color: no hay con qué comparar</span></div>
+  <div class="tw"><table id="tCmp"></table></div></div></div>
+ <div id="vCam" class="hide"><div class="card"><h3>Qué cambió (últimos 30 días)</h3><div class="hint">Precios que suben o bajan, unidades nuevas o que ya no aparecen, anuncios que empiezan o terminan.</div><div class="tw"><table id="tCam"></table></div><div class="pager" id="pgCam"></div></div></div>
+ </div>
+</div>
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbwAHnLcV14158WtSM7Z35wEVJ8Z1wBa0jpNCHLyJn31HpvttniCt6NQ-bXtqUGjfUS94g/exec';
+var KEY = new URLSearchParams(location.search).get('key') || '';
+var MARCA = new URLSearchParams(location.search).get('marca') || (document.querySelector('meta[name=marca]') || {}).content || '';
+function cargar(){
+  fetch(API + '?page=api&key=' + encodeURIComponent(KEY) + (MARCA ? '&marca=' + encodeURIComponent(MARCA) : ''))
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (d.error) throw new Error(d.error); iniciar(d); })
+    .catch(function(e){ $('loading').textContent = 'Error al cargar: ' + e.message; });
+}
+var D=null, marca='', view='res', UMBRAL=500, POR=20, PAG={meta:1,web:1,cam:1};
+function pagina(v,L){var tp=Math.max(1,Math.ceil(L.length/POR));if(PAG[v]>tp)PAG[v]=tp;var p=PAG[v];
+ var id={meta:'pgMeta',web:'pgWeb',cam:'pgCam'}[v];
+ $(id).innerHTML=L.length>POR?'<span>'+((p-1)*POR+1)+'–'+Math.min(p*POR,L.length)+' de '+L.length+'</span><span><button data-v="'+v+'" data-p="'+(p-1)+'"'+(p<=1?' disabled':'')+'>← Anterior</button> <b>Página '+p+' de '+tp+'</b> <button data-v="'+v+'" data-p="'+(p+1)+'"'+(p>=tp?' disabled':'')+'>Siguiente →</button></span>':(L.length?'<span>'+L.length+' en total</span>':'');
+ return L.slice((p-1)*POR,p*POR)}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function money(v){return v==null||v===''?'':'$'+Math.round(v).toLocaleString('en-US')}
+function pd(s){var p=String(s).split('/');return p.length==3?new Date(+p[2],p[0]-1,+p[1]):new Date(0)}
+function corto(d){return String(d).replace(/^Autocentro\s+/,'Autocentro ').replace(/\s+Nissan$|\s+Toyota$/,'').replace(/^Nissan de |^Toyota de /,'')}
+function kp(l,v,s){return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>'}
+function nuevo(fecha){return (pd(D.hoy)-pd(fecha))/864e5<=3}
+function dealersMarca(){return D.dealers.filter(function(d){return d.marca==marca}).sort(function(a,b){return (b.nuestro-a.nuestro)||a.dealer.localeCompare(b.dealer)})}
+function nuestro(d){return D.dealers.some(function(x){return x.dealer==d&&x.nuestro})}
+function W(){return D.web.filter(function(w){return w[12]==marca})}
+function M(){return D.meta.filter(function(a){return a[1]==marca})}
+var MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function estado(a){if(/termin/i.test(a[15]))return 'term';if(a[14]&&pd(a[14])<pd(D.hoy))return 'cad';return 'vig'}
+function mesKey(f){var p=String(f).split('/');return p.length==3?p[2]+'-'+('0'+p[0]).slice(-2):''}
+function mesTxt(k){if(!k)return 'Sin fecha';var p=k.split('-');var t=MESES[+p[1]-1]+' '+p[0];return t.charAt(0).toUpperCase()+t.slice(1)}
+function MA(){return M().filter(function(a){return estado(a)!='term'})}
+
+function iniciar(d){
+ if(!d||!d.dealers){$('loading').textContent='No llegaron datos del servidor. Revisa que Web.gs esté actualizado y publicada la nueva versión.';return}
+ D=d;
+ var marcas=[];D.dealers.forEach(function(x){if(marcas.indexOf(x.marca)<0)marcas.push(x.marca)});
+ if(D.marcaFija){marcas=[D.marcaFija];document.title='Competencia '+D.marcaFija+' | Autocentro';document.querySelector('header h1').textContent='Competencia '+D.marcaFija+' · Ofertas y Precios'}
+ marca=marcas[0]||'';
+ $('marcas').innerHTML=marcas.map(function(m){return '<button class="tab'+(m==marca?' on':'')+'" data-m="'+esc(m)+'">'+esc(m)+'</button>'}).join('');
+ $('upd').textContent='Websites: '+(D.actWeb||'—')+' · Meta: '+(D.actMeta||'aún no activado');
+ $('loading').classList.add('hide');$('app').classList.remove('hide');
+ llenarFiltros();render();
+}
+function llenarFiltros(){
+ var ds=dealersMarca();
+ $('fDeal').innerHTML='<option value="">Todos</option>'+ds.map(function(d){return '<option value="'+esc(d.dealer)+'">'+esc(d.dealer)+(d.nuestro?' (nosotros)':'')+'</option>'}).join('');
+ var mods={};W().forEach(function(w){mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]).split(' ')[0];if(b&&!/todos|varios|servicio/i.test(b))mods[b]=1});
+ var ms={};M().forEach(function(a){ms[mesKey(a[10])]=1});
+ $('fMes').innerHTML='<option value="">Todos</option>'+Object.keys(ms).sort().reverse().map(function(k){return '<option value="'+k+'">'+mesTxt(k)+'</option>'}).join('');
+ $('fMod').innerHTML='<option value="">Todos</option>'+Object.keys(mods).sort().map(function(m){return '<option>'+esc(m)+'</option>'}).join('');
+}
+function fWeb(){var d=$('fDeal').value,m=$('fMod').value,q=$('q').value.toLowerCase();
+ return W().filter(function(w){return(!d||w[0]==d)&&(!m||w[2]==m)&&(!q||[w[0],w[1],w[2],w[3],w[6],w[7],w[11]].join(' ').toLowerCase().indexOf(q)>=0)})}
+function fMeta(){var d=$('fDeal').value,m=$('fMod').value,t=$('fTipo').value,q=$('q').value.toLowerCase(),e=$('fEst').value,me=$('fMes').value;
+ return M().filter(function(a){var es=estado(a);return(!e||(e=='act'?es!='term':es==e))&&(!me||mesKey(a[10])==me)&&(!d||a[2]==d)&&(!m||String(a[3]).indexOf(m)==0)&&(!t||a[+t]!=null)&&(!q||[a[2],a[3],a[4],a[9]].join(' ').toLowerCase().indexOf(q)>=0)})}
+
+function render(){
+ $('nMeta').textContent=MA().length;$('nWeb').textContent=W().length;$('nCam').textContent=D.cambios.filter(function(c){return c[2]==marca}).length;
+ ['res','meta','web','inv','cmp','cam'].forEach(function(v){$('v'+v.charAt(0).toUpperCase()+v.slice(1)).classList.toggle('hide',view!=v)});
+ $('bTipo').classList.toggle('hide',view!='meta');$('bEst').classList.toggle('hide',view!='meta');$('bMes').classList.toggle('hide',view!='meta');$('bOrd').classList.toggle('hide',view!='meta');$('bDeal').classList.toggle('hide',view=='res'||view=='inv'||view=='cmp');
+ ({res:vRes,meta:vMeta,web:vWeb,inv:vInv,cmp:vCmp,cam:vCam})[view]();
+}
+
+/* ---------- Resumen ---------- */
+function vRes(){
+ var mf=$('fMod').value,mods={};W().forEach(function(w){mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]).split(' ')[0];if(b&&!/todos/i.test(b))mods[b]=1});
+ var lista=Object.keys(mods).sort();if(mf)lista=[mf];
+ function best(arr,i,low){var l=arr.filter(function(x){return x[i]!=null});l.sort(function(a,b){return low?a[i]-b[i]:b[i]-a[i]});return l[0]}
+ var gana=0,pierde=0;
+ var rows=lista.map(function(m){
+  var A=M().filter(function(a){return estado(a)=='vig'&&String(a[3]).indexOf(m)==0}),C=A.filter(function(a){return !nuestro(a[2])}),O=A.filter(function(a){return nuestro(a[2])});
+  var Wm=W().filter(function(w){return w[2]==m}),WC=Wm.filter(function(w){return !nuestro(w[0])}),WO=Wm.filter(function(w){return nuestro(w[0])});
+  var bp=best(C,5,1),op=best(O,5,1),ba=best(C,7,1),bb=best(C,8,0),bw=best(WC,4,1),ow=best(WO,4,1);
+  if(bw&&ow){if(ow[4]<=bw[4])gana++;else pierde++}
+  function c(x,i,fmt,di){return x?'<td><b>'+fmt(x[i])+'</b><span class="u">'+esc(corto(x[di]))+'</span></td>':'<td class="muted">—</td>'}
+  var dif=bw&&ow?ow[4]-bw[4]:null;
+  var aviso=dif==null?'<span class="muted">—</span>':dif<=0?'<span class="pill down">Somos los más bajos</span>':'<span class="pill '+(dif<=UMBRAL?'mid':'up')+'">+'+money(dif)+' vs. competencia</span>';
+  return '<tr><td><b>'+esc(m)+'</b></td>'+c(bp,5,function(v){return money(v)+'/mes'},2)+'<td>'+(op?'<b>'+money(op[5])+'/mes</b>':'<span class="muted">—</span>')+'</td>'+c(ba,7,function(v){return v+'%'},2)+c(bb,8,money,2)+
+   c(bw,4,money,0)+'<td>'+(ow?'<b>'+money(ow[4])+'</b>':'<span class="muted">—</span>')+'</td><td>'+aviso+'</td></tr>'});
+ $('tRes').innerHTML='<tr><th>Modelo</th><th>Pago más bajo<br>competencia (Meta)</th><th>Nuestro pago<br>(Meta)</th><th>APR más bajo</th><th>Bono más alto</th><th>Precio más bajo<br>competencia (web)</th><th>Nuestro precio<br>más bajo (web)</th><th>Precio web</th></tr>'+rows.join('');
+ var comp=MA().filter(function(a){return !nuestro(a[2])});
+ $('kpis').innerHTML=kp('Anuncios de la competencia',comp.length||'—',comp.length?'activos en Meta':'lectura de Meta aún no activada')+
+  kp('Ofertas nuevas (72 h)',comp.filter(function(a){return nuevo(a[10])}).length,'anuncios que empezaron hace poco')+
+  kp('Modelos donde somos más baratos',gana,'de '+(gana+pierde)+' con precio publicado por ambos (web)')+
+  kp('Cambios en 7 días',D.cambios.filter(function(c){return c[2]==marca&&(pd(D.hoy)-pd(c[0]))/864e5<=7}).length,'precios, unidades y anuncios');
+}
+
+/* ---------- Meta ---------- */
+function vMeta(){
+ var L=fMeta(),C=L.filter(function(a){return !nuestro(a[2])}),CV=C.filter(function(a){return estado(a)=='vig'});
+ var pays=CV.filter(function(a){return a[5]!=null}).sort(function(a,b){return a[5]-b[5]}),aprs=CV.filter(function(a){return a[7]!=null}).sort(function(a,b){return a[7]-b[7]});
+ var ds=dealersMarca().filter(function(d){return !d.nuestro});
+ $('kpis').innerHTML=kp('Anuncios (con filtros)',C.length,ds.map(function(d){return corto(d.dealer)+' '+C.filter(function(a){return a[2]==d.dealer}).length}).join(' · '))+
+  kp('Caducados pero activos',C.filter(function(a){return estado(a)=='cad'}).length,'la oferta venció y el anuncio sigue corriendo')+
+  kp('Nuevos (72 h)',C.filter(function(a){return nuevo(a[10])}).length,'publicados en los últimos 3 días')+
+  kp('Pago más bajo (vigente)',pays.length?money(pays[0][5])+'/mes':'—',pays.length?esc(pays[0][3]+' · '+corto(pays[0][2])):'')+
+  kp('Tasa más baja (vigente)',aprs.length?aprs[0][7]+'%':'—',aprs.length?esc(aprs[0][3]+' · '+corto(aprs[0][2])):'');
+ if(!M().length){$('ads').innerHTML='<div class="card empty" style="grid-column:1/-1">Todavía no hay anuncios de Meta guardados.</div>';return}
+ if($('fOrd').value=='pay')L.sort(function(a,b){return(a[5]==null?1e9:a[5])-(b[5]==null?1e9:b[5])});else L.sort(function(a,b){return pd(b[10])-pd(a[10])});
+ var html='',ult=null,porMes={};L.forEach(function(a){var k=mesKey(a[10]);porMes[k]=(porMes[k]||0)+1});
+ pagina('meta',L).forEach(function(a){var k=mesKey(a[10]);
+  if($('fOrd').value!='pay'&&k!==ult){html+='<div class="mesh">Publicados en '+mesTxt(k)+' <span>'+porMes[k]+' anuncio'+(porMes[k]>1?'s':'')+'</span></div>';ult=k}
+  var our=nuestro(a[2]),es=estado(a),ch='';
+  if(a[5]!=null)ch+='<span class="chip pay">'+money(a[5])+'/mes</span>';if(a[6]!=null)ch+='<span class="chip">'+money(a[6])+'</span>';if(a[7]!=null)ch+='<span class="chip apr">'+a[7]+'% APR</span>';if(a[8]!=null)ch+='<span class="chip bono">Bono '+money(a[8])+'</span>';
+  var vig=es=='term'?'<span class="tag term">TERMINÓ · visto por última vez '+esc(a[16])+'</span>':es=='cad'?'<span class="tag cad">CADUCADA el '+esc(a[14])+'</span>':a[14]?'<span class="tag vig">Vigente hasta '+esc(a[14])+'</span>':'<span class="tag date">Sin fecha de vencimiento</span>';
+  html+='<div class="ad'+(our?' ours':'')+(es!='vig'?' old':'')+'"><div class="img"'+(a[12]?' style="background-image:url(\''+esc(a[12])+'\')"':'')+'></div><div class="b"><div class="d">'+(our?'<span class="tag ours-tag">NUESTRO</span> ':'')+esc(a[2])+'</div><div class="m">'+esc(a[3])+'</div><div class="o">'+esc(a[4])+'</div><div class="chips">'+ch+'</div>'+(a[9]?'<div class="small">'+esc(a[9])+'</div>':'')+
+   '<div class="dates">'+(nuevo(a[10])?'<span class="tag new">NUEVO</span>':'')+'<span class="tag date">Publicado '+esc(a[10])+'</span>'+vig+(/imagen/i.test(a[11])?'<span class="tag ver">Leído de imagen</span>':'')+'</div>'+
+   '<div class="foot"><span></span><a class="btn meta" target="_blank" rel="noopener" href="'+esc(a[13])+'">Ver anuncio en Meta ↗</a></div></div></div>'});
+ $('ads').innerHTML=html||'<div class="card empty" style="grid-column:1/-1">No hay anuncios con estos filtros.</div>';
+}
+
+/* ---------- Websites ---------- */
+function minPorSub(){var m={};W().forEach(function(w){if(w[4]==null)return;var k=w[2]+'|'+w[3];if(m[k]==null||w[4]<m[k])m[k]=w[4]});return m}
+function vWeb(){
+ var L=fWeb(),min=minPorSub();
+ L.sort(function(a,b){return a[2].localeCompare(b[2])||String(a[3]).localeCompare(String(b[3]))||((a[4]==null?1e9:a[4])-(b[4]==null?1e9:b[4]))});
+ var us=L.filter(function(w){return nuestro(w[0])}),sin=L.filter(function(w){return w[4]==null}).length,ofe=L.filter(function(w){return /oferta/i.test(w[11])}).length;
+ $('kpis').innerHTML=kp('Unidades',L.length,'nuestras '+us.length+' · competencia '+(L.length-us.length))+kp('Sin precio publicado',sin,'dicen "Llamar"')+kp('Marcadas "En oferta"',ofe,'según el website')+kp('60+ días publicadas',L.filter(function(w){return !nuestro(w[0])&&w[10]>=60}).length,'de la competencia · candidatas a rebaja');
+ $('tWeb').innerHTML='<tr><th></th><th>Dealer</th><th>Vehículo</th><th class="n">Precio</th><th class="n">Precio lista</th><th class="n">Descuento</th><th class="n">Días</th><th></th></tr>'+pagina('web',L).map(function(w){
+  var b=w[4]!=null&&min[w[2]+'|'+w[3]]==w[4];
+  return '<tr'+(nuestro(w[0])?' class="us"':'')+'><td>'+(w[9]?'<img class="thumb" loading="lazy" src="'+esc(w[9])+'" alt="">':'')+'</td><td>'+esc(w[0])+'</td><td class="veh"><b>'+esc(w[1]+' '+w[2])+'</b> '+esc(w[3])+(/oferta/i.test(w[11])?' <span class="tag oferta">En oferta</span>':'')+'<span class="u">'+esc([w[6],w[7]].filter(function(x){return x&&x!='-'}).join(' · '))+'</span></td>'+
+  '<td class="n">'+(w[4]==null?'<span class="muted">Llamar</span>':b?'<span class="best">'+money(w[4])+'</span>':money(w[4]))+'</td><td class="n muted">'+money(w[5])+'</td><td class="n">'+(w[5]&&w[4]?money(w[5]-w[4]):'')+'</td>'+
+  '<td class="n"><span class="dias'+(w[10]>=60?' old':'')+'">'+(w[10]==null?'':w[10])+'</span></td><td>'+(w[8]?'<a class="btn web" target="_blank" rel="noopener" href="'+esc(w[8])+'">Ver ↗</a>':'')+'</td></tr>'}).join('');
+}
+
+/* ---------- Inventario ---------- */
+function vInv(){
+ var mf=$('fMod').value,ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer});
+ function u(d,m,s){return W().filter(function(w){return w[0]==d&&w[2]==m&&(s==null||w[3]==s)}).length}
+ var mods={};W().forEach(function(w){if(!mf||w[2]==mf)mods[w[2]]=1});mods=Object.keys(mods).sort();
+ var T=dn.map(function(){return 0}),h='<tr><th>Modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':'')+'</th>'}).join('')+'<th class="n">Total</th><th class="n">Nuestra parte</th></tr>';
+ var iUs=ds.findIndex(function(d){return d.nuestro});
+ function fila(nombre,c,cls){var t=c.reduce(function(a,b){return a+b},0),mx=Math.max.apply(0,c),varios=c.filter(function(x){return x}).length>1;
+  return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(nombre)+'</td>'+c.map(function(x){return '<td class="n'+(x==mx&&x>0&&varios?' top':'')+'">'+(x||'<span class="muted">0</span>')+'</td>'}).join('')+'<td class="n">'+t+'</td><td class="n">'+(t&&iUs>=0?Math.round(100*c[iUs]/t)+'%':'—')+'</td></tr>'}
+ mods.forEach(function(m){var c=dn.map(function(d){return u(d,m)});c.forEach(function(x,i){T[i]+=x});h+=fila(m,c,'mod');
+  var subs={};W().forEach(function(w){if(w[2]==m)subs[w[3]]=1});Object.keys(subs).sort().forEach(function(s){h+=fila(s,dn.map(function(d){return u(d,m,s)}))})});
+ h+=fila('Total',T,'mod');$('tInv').innerHTML=h;
+ var TT=T.reduce(function(a,b){return a+b},0);
+ $('kpis').innerHTML=ds.map(function(d,i){return kp(esc(corto(d.dealer))+(d.nuestro?' (nosotros)':''),T[i],'unidades en website · '+(TT?Math.round(100*T[i]/TT):0)+'% del total')}).join('')+
+  dealersMarca().filter(function(d){return !d.web}).map(function(d){return kp(esc(corto(d.dealer)),'—','no publica inventario en su website')}).join('');
+}
+
+/* ---------- Comparativo ---------- */
+function vCmp(){
+ var mf=$('fMod').value,ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer}),iUs=ds.findIndex(function(d){return d.nuestro});
+ var keys={};W().forEach(function(w){if(!mf||w[2]==mf)keys[w[2]+'|'+w[3]]=1});keys=Object.keys(keys).sort();
+ var h='<tr><th>Sub-modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':'')+'</th>'}).join('')+'<th class="n">Dif. vs más barato</th></tr>',last='',nb=0,nc=0;
+ keys.forEach(function(k){var p=k.split('|');if(p[0]!=last){h+='<tr class="mod"><td colspan="'+(ds.length+2)+'">'+esc(p[0])+'</td></tr>';last=p[0]}
+  var R=dn.map(function(d){var x=W().filter(function(w){return w[0]==d&&w[2]==p[0]&&w[3]==p[1]});var pr=x.filter(function(w){return w[4]!=null}).map(function(w){return w[4]});return x.length?{n:x.length,p:pr.length?Math.min.apply(0,pr):null}:null});
+  var v=R.map(function(r){return r&&r.p}),all=v.filter(function(x){return x}),mn=all.length?Math.min.apply(0,all):null;
+  var ours=iUs>=0?v[iUs]:null,cs=v.filter(function(x,i){return i!=iUs&&x}),mc=cs.length?Math.min.apply(0,cs):null,dif=ours&&mc?ours-mc:null;
+  if(dif!=null){if(dif<=0)nb++;else nc++}
+  var band=dif==null?'':dif<=0?' class="r-g"':dif<=UMBRAL?' class="r-o"':' class="r-r"';
+  h+='<tr'+band+'><td>'+esc(p[1])+'</td>'+R.map(function(r){if(!r)return '<td class="n"><span class="muted">—</span></td>';
+   var pr=r.p?(r.p==mn&&all.length>1?'<span class="best">'+money(r.p)+'</span>':money(r.p)):'<span class="muted">Llamar</span>';
+   return '<td class="n">'+pr+'<span class="u">'+r.n+' unidad'+(r.n>1?'es':'')+'</span></td>'}).join('')+
+   '<td class="n">'+(dif==null?'<span class="muted">—</span>':dif>0?'<span class="pill '+(dif<=UMBRAL?'mid':'up')+'">+'+money(dif)+'</span>':dif<0?'<span class="pill down">−'+money(-dif)+'</span>':'<span class="pill eq">Igual</span>')+'</td></tr>'});
+ $('tCmp').innerHTML=h;
+ $('kpis').innerHTML=kp('Somos los más baratos',nb,'de '+(nb+nc)+' sub-modelos comparables')+kp('Estamos más caros',nc,'sub-modelos con un competidor más bajo')+
+  kp('Diferencia mayor',(function(){var mx=0,t='';keys.forEach(function(){});return '—'})(),'');
+ // Diferencia mayor: calcular aparte
+ var peor=null;keys.forEach(function(k){var p=k.split('|');var pr=function(d){var x=W().filter(function(w){return w[0]==d&&w[2]==p[0]&&w[3]==p[1]&&w[4]!=null}).map(function(w){return w[4]});return x.length?Math.min.apply(0,x):null};
+  var o=iUs>=0?pr(dn[iUs]):null,c=dn.filter(function(d,i){return i!=iUs}).map(pr).filter(function(x){return x}),m=c.length?Math.min.apply(0,c):null;if(o&&m&&o-m>0&&(!peor||o-m>peor.d))peor={d:o-m,t:p[0]+' '+p[1]}});
+ $('kpis').lastChild.outerHTML=kp('Diferencia mayor',peor?'+'+money(peor.d):'—',peor?esc(peor.t):'no estamos más caros en ninguno');
+}
+
+/* ---------- Cambios ---------- */
+function vCam(){
+ var d=$('fDeal').value,m=$('fMod').value,q=$('q').value.toLowerCase();
+ var L=D.cambios.filter(function(c){return c[2]==marca&&(!d||c[3]==d)&&(!m||String(c[4]).indexOf(m)>=0)&&(!q||String(c[4]).toLowerCase().indexOf(q)>=0)});
+ var ico={'Precio bajó':'<span class="pill down">▼ Precio bajó</span>','Precio subió':'<span class="pill up">▲ Precio subió</span>','Anuncio nuevo':'<span class="tag new">Anuncio nuevo</span>','Anuncio terminó':'<span class="pill eq">Anuncio terminó</span>','Unidad nueva':'<span class="pill eq">+ Unidad nueva</span>','Ya no aparece':'<span class="pill eq">− Ya no aparece</span>'};
+ $('kpis').innerHTML=kp('Bajas de precio',L.filter(function(c){return c[1]=='Precio bajó'}).length,'últimos 30 días')+kp('Subidas de precio',L.filter(function(c){return c[1]=='Precio subió'}).length,'últimos 30 días')+kp('Unidades nuevas',L.filter(function(c){return c[1]=='Unidad nueva'}).length,'últimos 30 días')+kp('Ya no aparecen',L.filter(function(c){return c[1]=='Ya no aparece'}).length,'posiblemente vendidas');
+ $('tCam').innerHTML=L.length?'<tr><th>Fecha</th><th>Cambio</th><th>Dealer</th><th>Qué</th><th class="n">Antes</th><th class="n">Ahora</th><th class="n">Diferencia</th><th></th></tr>'+pagina('cam',L).map(function(c){var df=c[5]!=null&&c[6]!=null?c[6]-c[5]:null;
+  return '<tr><td>'+esc(c[0])+'</td><td>'+(ico[c[1]]||esc(c[1]))+'</td><td>'+esc(corto(c[3]))+'</td><td class="que">'+esc(c[4])+'</td><td class="n muted">'+money(c[5])+'</td><td class="n"><b>'+money(c[6])+'</b></td><td class="n">'+(df==null||df==0?'':(df<0?'<span class="pill down">−'+money(-df)+'</span>':'<span class="pill up">+'+money(df)+'</span>'))+'</td><td>'+(c[7]&&c[1]!='Ya no aparece'?'<a class="btn '+(c[8]=='meta'?'meta':'web')+'" target="_blank" rel="noopener" href="'+esc(c[7])+'">'+(c[8]=='meta'?'Anuncio ↗':'Ver ↗')+'</a>':'')+'</td></tr>'}).join('')
+  :($('pgCam').innerHTML='','<tr><td class="empty">Todavía no hay cambios. Se empiezan a registrar desde la segunda actualización diaria.</td></tr>');
+}
+
+/* ---------- Exportar ---------- */
+$('csv').onclick=function(){var h,rows;
+ if(view=='meta'){h=['Dealer','Modelo','Oferta','Pago','Precio','APR','Bono','Letras pequeñas','Desde','Enlace'];rows=fMeta().map(function(a){return [a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[13]]})}
+ else if(view=='cam'){h=['Fecha','Cambio','Dealer','Qué','Antes','Ahora','Enlace'];rows=D.cambios.filter(function(c){return c[2]==marca}).map(function(c){return [c[0],c[1],c[3],c[4],c[5],c[6],c[7]]})}
+ else{h=['Dealer','Año','Modelo','Sub-modelo','Precio','Precio lista','Color','VIN','Días publicado','Enlace'];rows=fWeb().map(function(w){return [w[0],w[1],w[2],w[3],w[4],w[5],w[6],w[7],w[10],w[8]]})}
+ var csv='﻿'+[h].concat(rows).map(function(r){return r.map(function(x){return '"'+String(x==null?'':x).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+ var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='competencia-'+marca.toLowerCase()+'-'+view+'.csv';document.body.appendChild(a);a.click();a.remove()};
+
+$('views').onclick=function(e){var b=e.target.closest('.view');if(!b)return;document.querySelectorAll('.view').forEach(function(x){x.classList.remove('on')});b.classList.add('on');view=b.dataset.v;PAG={meta:1,web:1,cam:1};render()};
+$('marcas').onclick=function(e){var b=e.target.closest('.tab');if(!b)return;document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});b.classList.add('on');marca=b.dataset.m;PAG={meta:1,web:1,cam:1};llenarFiltros();render()};
+function filtrar(){PAG={meta:1,web:1,cam:1};render()}
+['fDeal','fMod','fTipo','fOrd','fEst','fMes'].forEach(function(i){$(i).onchange=filtrar});$('q').oninput=filtrar;
+document.addEventListener('click',function(e){var b=e.target.closest('.pager button');if(!b||b.disabled)return;PAG[b.dataset.v]=+b.dataset.p;render();
+ var t={meta:'vMeta',web:'vWeb',cam:'vCam'}[b.dataset.v];$(t).scrollIntoView({behavior:'smooth',block:'start'})});
+cargar();
+</script></body></html>
