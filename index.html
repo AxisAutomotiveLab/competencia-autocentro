@@ -154,7 +154,7 @@ function render(){
 
 /* ---------- Resumen ---------- */
 function vRes(){
- var mf=$('fMod').value,mods={};W().forEach(function(w){mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]).split(' ')[0];if(b&&!/todos/i.test(b))mods[b]=1});
+ var mf=$('fMod').value,mods={};W().forEach(function(w){mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]).split(' ')[0];if(b&&!/todos|varios/i.test(b))mods[b]=1});
  var lista=Object.keys(mods).sort();if(mf)lista=[mf];
  function best(arr,i,low){var l=arr.filter(function(x){return x[i]!=null});l.sort(function(a,b){return low?a[i]-b[i]:b[i]-a[i]});return l[0]}
  var gana=0,pierde=0;
@@ -204,7 +204,7 @@ function vMeta(){
 function minPorSub(){var m={};W().forEach(function(w){if(w[4]==null)return;var k=w[2]+'|'+w[3];if(m[k]==null||w[4]<m[k])m[k]=w[4]});return m}
 function vWeb(){
  var L=fWeb(),min=minPorSub();
- L.sort(function(a,b){return a[2].localeCompare(b[2])||String(a[3]).localeCompare(String(b[3]))||((a[4]==null?1e9:a[4])-(b[4]==null?1e9:b[4]))});
+ L.sort(function(a,b){return String(a[2]).localeCompare(String(b[2]))||String(a[3]).localeCompare(String(b[3]))||((a[4]==null?1e9:a[4])-(b[4]==null?1e9:b[4]))});
  var us=L.filter(function(w){return nuestro(w[0])}),sin=L.filter(function(w){return w[4]==null}).length,ofe=L.filter(function(w){return /oferta/i.test(w[11])}).length;
  $('kpis').innerHTML=kp('Unidades',L.length,'nuestras '+us.length+' · competencia '+(L.length-us.length))+kp('Sin precio publicado',sin,'dicen "Llamar"')+kp('Marcadas "En oferta"',ofe,'según el website')+kp('60+ días publicadas',L.filter(function(w){return !nuestro(w[0])&&w[10]>=60}).length,'de la competencia · candidatas a rebaja');
  $('tWeb').innerHTML='<tr><th></th><th>Dealer</th><th>Vehículo</th><th class="n">Precio</th><th class="n">Precio lista</th><th class="n">Descuento</th><th class="n">Días</th><th></th></tr>'+pagina('web',L).map(function(w){
