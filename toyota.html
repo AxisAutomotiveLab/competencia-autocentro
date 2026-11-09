@@ -124,9 +124,26 @@ function mesKey(f){var p=String(f).split('/');return p.length==3?p[2]+'-'+('0'+p
 function mesTxt(k){if(!k)return 'Sin fecha';var p=k.split('-');var t=MESES[+p[1]-1]+' '+p[0];return t.charAt(0).toUpperCase()+t.slice(1)}
 function MA(){return M().filter(function(a){return estado(a)!='term'})}
 
+function normData(d){
+ (d.web||[]).forEach(function(w){
+  var m=String(w[2]||'').trim();
+  if(/^grand$/i.test(m)){w[2]=/toyota/i.test(w[12])?'Grand Highlander':'Grand Cherokee';w[3]=String(w[3]||'').replace(/^h?igh?l\S*\s*/i,'')||w[3]}
+  else if(/^rav$/i.test(m))w[2]='RAV4';
+  else if(/^land(y)?$/i.test(m)){w[2]='Land Cruiser';w[3]=String(w[3]||'').replace(/^cruiser\s*/i,'')||w[3]}
+  else if(/^sr$/i.test(m)&&/toyota/i.test(w[12])){w[3]=('SR '+String(w[3]||'')).trim();w[2]='Tacoma'}
+ });
+ (d.meta||[]).forEach(function(a){
+  var m=String(a[3]||'').trim();
+  if(/^grand$/i.test(m))a[3]=/toyota/i.test(a[1])?'Grand Highlander':'Grand Cherokee';
+  else if(/^rav$/i.test(m))a[3]='RAV4';
+  else if(/^land(y)?$/i.test(m))a[3]='Land Cruiser';
+  else if(/^sr$/i.test(m)&&/toyota/i.test(a[1]))a[3]='Tacoma';
+ });
+}
+function matchMod(aMod,m){var s=String(aMod||'').trim();if(s==m)return true;if(/^varios:/i.test(s))return s.replace(/^varios:\s*/i,'').split(/\s*,\s*/).indexOf(m)>=0;return false}
 function iniciar(d){
  if(!d||!d.dealers){$('loading').textContent='No llegaron datos del servidor. Revisa que Web.gs esté actualizado y publicada la nueva versión.';return}
- D=d;
+ normData(d);D=d;
  var marcas=[];D.dealers.forEach(function(x){if(marcas.indexOf(x.marca)<0)marcas.push(x.marca)});
  if(D.marcaFija){marcas=[D.marcaFija];document.title='Competencia '+D.marcaFija+' | Autocentro';document.querySelector('header h1').textContent='Competencia '+D.marcaFija+' · Ofertas y Precios'}
  marca=marcas[0]||'';
@@ -138,7 +155,7 @@ function iniciar(d){
 function llenarFiltros(){
  var ds=dealersMarca();
  $('fDeal').innerHTML='<option value="">Todos</option>'+ds.map(function(d){return '<option value="'+esc(d.dealer)+'">'+esc(d.dealer)+(d.nuestro?' (nosotros)':'')+'</option>'}).join('');
- var mods={};W().forEach(function(w){mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]).split(' ')[0];if(b&&!/todos|varios|servicio/i.test(b))mods[b]=1});
+ var mods={};W().forEach(function(w){if(w[2])mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]||'').trim();if(b&&!/^todos|^varios|^servicio/i.test(b))mods[b]=1});
  var ms={};M().forEach(function(a){ms[mesKey(a[10])]=1});
  $('fMes').innerHTML='<option value="">Todos</option>'+Object.keys(ms).sort().reverse().map(function(k){return '<option value="'+k+'">'+mesTxt(k)+'</option>'}).join('');
  $('fMod').innerHTML='<option value="">Todos</option>'+Object.keys(mods).sort().map(function(m){return '<option>'+esc(m)+'</option>'}).join('');
@@ -146,7 +163,7 @@ function llenarFiltros(){
 function fWeb(){var d=$('fDeal').value,m=$('fMod').value,q=$('q').value.toLowerCase();
  return W().filter(function(w){return(!d||w[0]==d)&&(!m||w[2]==m)&&(!q||[w[0],w[1],w[2],w[3],w[6],w[7],w[11]].join(' ').toLowerCase().indexOf(q)>=0)})}
 function fMeta(){var d=$('fDeal').value,m=$('fMod').value,t=$('fTipo').value,q=$('q').value.toLowerCase(),e=$('fEst').value,me=$('fMes').value;
- return M().filter(function(a){var es=estado(a);return(!e||(e=='act'?es!='term':es==e))&&(!me||mesKey(a[10])==me)&&(!d||a[2]==d)&&(!m||String(a[3]).indexOf(m)==0)&&(!t||a[+t]!=null)&&(!q||[a[2],a[3],a[4],a[9]].join(' ').toLowerCase().indexOf(q)>=0)})}
+ return M().filter(function(a){var es=estado(a);return(!e||(e=='act'?es!='term':es==e))&&(!me||mesKey(a[10])==me)&&(!d||a[2]==d)&&(!m||matchMod(a[3],m))&&(!t||a[+t]!=null)&&(!q||[a[2],a[3],a[4],a[9]].join(' ').toLowerCase().indexOf(q)>=0)})}
 
 function render(){
  $('nMeta').textContent=MA().length;$('nWeb').textContent=W().length;$('nCam').textContent=D.cambios.filter(function(c){return c[2]==marca}).length;
@@ -157,12 +174,12 @@ function render(){
 
 /* ---------- Resumen ---------- */
 function vRes(){
- var mf=$('fMod').value,mods={};W().forEach(function(w){mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]).split(' ')[0];if(b&&!/todos|varios/i.test(b))mods[b]=1});
+ var mf=$('fMod').value,mods={};W().forEach(function(w){if(w[2])mods[w[2]]=1});M().forEach(function(a){var b=String(a[3]||'').trim();if(b&&!/^todos|^varios/i.test(b))mods[b]=1});
  var lista=Object.keys(mods).sort();if(mf)lista=[mf];
  function best(arr,i,low){var l=arr.filter(function(x){return x[i]!=null});l.sort(function(a,b){return low?a[i]-b[i]:b[i]-a[i]});return l[0]}
  var gana=0,pierde=0;
  var rows=lista.map(function(m){
-  var A=M().filter(function(a){return estado(a)=='vig'&&String(a[3]).indexOf(m)==0}),C=A.filter(function(a){return !nuestro(a[2])}),O=A.filter(function(a){return nuestro(a[2])});
+  var A=M().filter(function(a){return estado(a)=='vig'&&String(a[3]||'').trim()==m}),C=A.filter(function(a){return !nuestro(a[2])}),O=A.filter(function(a){return nuestro(a[2])});
   var Wm=W().filter(function(w){return w[2]==m}),WC=Wm.filter(function(w){return !nuestro(w[0])}),WO=Wm.filter(function(w){return nuestro(w[0])});
   var bp=best(C,5,1),op=best(O,5,1),ba=best(C,7,1),bb=best(C,8,0),bw=best(WC,4,1),ow=best(WO,4,1);
   if(bw&&ow){if(ow[4]<=bw[4])gana++;else pierde++}
