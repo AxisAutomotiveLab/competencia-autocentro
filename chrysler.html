@@ -191,6 +191,7 @@ function vMeta(){
  if(!M().length){$('ads').innerHTML='<div class="card empty" style="grid-column:1/-1">Todavía no hay anuncios de Meta guardados.</div>';return}
  if($('fOrd').value=='pay')L.sort(function(a,b){return(a[5]==null?1e9:a[5])-(b[5]==null?1e9:b[5])});else L.sort(function(a,b){return pd(b[10])-pd(a[10])});
  var html='',ult=null,porMes={};L.forEach(function(a){var k=mesKey(a[10]);porMes[k]=(porMes[k]||0)+1});
+ var notaAlberic=/chrysler/i.test(marca)&&(!$('fDeal').value||/alberic/i.test($('fDeal').value))?'<div class="card" style="grid-column:1/-1;background:#FEF3E2;border-color:#F59E0B;padding:12px 16px;font-size:13px;color:#92400E"><b>ℹ️ Nota sobre Alberic Chrysler (0 en Meta):</b> Alberic no utiliza anuncios pagados (promociones) en la Biblioteca de Anuncios de Meta. Sus ofertas las sube únicamente como publicaciones orgánicas normales en su muro de Facebook, las cuales requieren iniciar sesión en una cuenta de Facebook para poder extraerse.</div>':'';
  pagina('meta',L).forEach(function(a){var k=mesKey(a[10]);
   if($('fOrd').value!='pay'&&k!==ult){html+='<div class="mesh">Publicados en '+mesTxt(k)+' <span>'+porMes[k]+' anuncio'+(porMes[k]>1?'s':'')+'</span></div>';ult=k}
   var our=nuestro(a[2]),es=estado(a),ch='';
@@ -199,7 +200,7 @@ function vMeta(){
   html+='<div class="ad'+(our?' ours':'')+(es!='vig'?' old':'')+'"><div class="img"'+(a[12]?' style="background-image:url(\''+esc(a[12])+'\')"':'')+'></div><div class="b"><div class="d">'+(our?'<span class="tag ours-tag">NUESTRO</span> ':'')+esc(a[2])+'</div><div class="m">'+esc(a[3])+'</div><div class="o">'+esc(a[4])+'</div><div class="chips">'+ch+'</div>'+(a[9]?'<div class="small">'+esc(a[9])+'</div>':'')+
    '<div class="dates">'+(nuevo(a[10])?'<span class="tag new">NUEVO</span>':'')+'<span class="tag date">Publicado '+esc(a[10])+'</span>'+vig+(/imagen/i.test(a[11])?'<span class="tag ver">Leído de imagen</span>':'')+'</div>'+
    '<div class="foot"><span></span><a class="btn meta" target="_blank" rel="noopener" href="'+esc(a[13])+'">Ver anuncio en Meta ↗</a></div></div></div>'});
- $('ads').innerHTML=html||'<div class="card empty" style="grid-column:1/-1">No hay anuncios con estos filtros.</div>';
+ $('ads').innerHTML=notaAlberic+(html||(/alberic/i.test($('fDeal').value)?'':'<div class="card empty" style="grid-column:1/-1">No hay anuncios con estos filtros.</div>'));
 }
 
 /* ---------- Websites ---------- */
