@@ -82,10 +82,10 @@ td.que{white-space:normal;min-width:220px;max-width:380px}
  <div id="vRes"><div class="card"><h3>Mejor oferta por modelo</h3><div class="hint">Lo mejor que anuncia la competencia en Meta y publica en su website, junto a lo nuestro.</div><div class="tw"><table id="tRes"></table></div></div></div>
  <div id="vMeta" class="hide"><div class="ads" id="ads"></div><div class="pager" id="pgMeta"></div></div>
  <div id="vWeb" class="hide"><div class="card"><h3>Vehículos publicados en los websites</h3><div class="hint">Cada fila abre la página de ese vehículo. En verde: el precio más bajo de ese sub-modelo entre todos los dealers. Días publicado en rojo: 60 o más.</div><div class="tw"><table id="tWeb"></table></div><div class="pager" id="pgWeb"></div></div></div>
- <div id="vInv" class="hide"><div class="card"><h3>Unidades nuevas publicadas por modelo</h3><div class="hint">La fila gris es el total del modelo; debajo, cada sub-modelo. En negrita: quién tiene más.</div><div class="tw"><table id="tInv"></table></div></div></div>
+ <div id="vInv" class="hide"><div class="card"><h3>Unidades nuevas publicadas por modelo</h3><div class="hint">La fila gris es el total del modelo; debajo, cada sub-modelo. En negrita: quién tiene más.</div><div class="tw"><table id="tInv"></table></div><div class="pager" id="pgInv"></div></div></div>
  <div id="vCmp" class="hide"><div class="card"><h3>Precio más bajo por sub-modelo (websites)</h3><div class="hint">La diferencia compara nuestro precio más bajo con el del competidor más barato.</div>
   <div class="legend"><span><i style="background:#1E7F4F"></i>Bajo: somos los más baratos o iguales</span><span><i style="background:#D97706"></i>Medio: hasta $500 más caros</span><span><i style="background:#B3122E"></i>Alto: más de $500 más caros</span><span><i style="background:#E5E7EB"></i>Sin color: no hay con qué comparar</span></div>
-  <div class="tw"><table id="tCmp"></table></div></div></div>
+  <div class="tw"><table id="tCmp"></table></div><div class="pager" id="pgCmp"></div></div></div>
  <div id="vCam" class="hide"><div class="card"><h3>Qué cambió (últimos 30 días)</h3><div class="hint">Precios que suben o bajan, unidades nuevas o que ya no aparecen, anuncios que empiezan o terminan.</div><div class="tw"><table id="tCam"></table></div><div class="pager" id="pgCam"></div></div></div>
  </div>
 </div>
@@ -99,9 +99,9 @@ function cargar(){
     .then(function(d){ if (d.error) throw new Error(d.error); iniciar(d); })
     .catch(function(e){ $('loading').textContent = 'Error al cargar: ' + e.message; });
 }
-var D=null, marca='', view='res', UMBRAL=500, POR=20, PAG={meta:1,web:1,cam:1};
+var D=null, marca='', view='res', UMBRAL=500, POR=20, PAG={meta:1,web:1,inv:1,cmp:1,cam:1};
 function pagina(v,L){var tp=Math.max(1,Math.ceil(L.length/POR));if(PAG[v]>tp)PAG[v]=tp;var p=PAG[v];
- var id={meta:'pgMeta',web:'pgWeb',cam:'pgCam'}[v];
+ var id={meta:'pgMeta',web:'pgWeb',inv:'pgInv',cmp:'pgCmp',cam:'pgCam'}[v];
  $(id).innerHTML=L.length>POR?'<span>'+((p-1)*POR+1)+'–'+Math.min(p*POR,L.length)+' de '+L.length+'</span><span><button data-v="'+v+'" data-p="'+(p-1)+'"'+(p<=1?' disabled':'')+'>← Anterior</button> <b>Página '+p+' de '+tp+'</b> <button data-v="'+v+'" data-p="'+(p+1)+'"'+(p>=tp?' disabled':'')+'>Siguiente →</button></span>':(L.length?'<span>'+L.length+' en total</span>':'');
  return L.slice((p-1)*POR,p*POR)}
 function $(i){return document.getElementById(i)}
@@ -216,16 +216,21 @@ function vWeb(){
 
 /* ---------- Inventario ---------- */
 function vInv(){
- var mf=$('fMod').value,ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer});
+ var mf=$('fMod').value,q=$('q').value.toLowerCase(),ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer});
  function u(d,m,s){return W().filter(function(w){return w[0]==d&&w[2]==m&&(s==null||w[3]==s)}).length}
  var mods={};W().forEach(function(w){if(!mf||w[2]==mf)mods[w[2]]=1});mods=Object.keys(mods).sort();
  var T=dn.map(function(){return 0}),h='<tr><th>Modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':'')+'</th>'}).join('')+'<th class="n">Total</th><th class="n">Nuestra parte</th></tr>';
- var iUs=ds.findIndex(function(d){return d.nuestro});
+ var iUs=ds.findIndex(function(d){return d.nuestro}),filas=[];
  function fila(nombre,c,cls){var t=c.reduce(function(a,b){return a+b},0),mx=Math.max.apply(0,c),varios=c.filter(function(x){return x}).length>1;
   return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(nombre)+'</td>'+c.map(function(x){return '<td class="n'+(x==mx&&x>0&&varios?' top':'')+'">'+(x||'<span class="muted">0</span>')+'</td>'}).join('')+'<td class="n">'+t+'</td><td class="n">'+(t&&iUs>=0?Math.round(100*c[iUs]/t)+'%':'—')+'</td></tr>'}
- mods.forEach(function(m){var c=dn.map(function(d){return u(d,m)});c.forEach(function(x,i){T[i]+=x});h+=fila(m,c,'mod');
-  var subs={};W().forEach(function(w){if(w[2]==m)subs[w[3]]=1});Object.keys(subs).sort().forEach(function(s){h+=fila(s,dn.map(function(d){return u(d,m,s)}))})});
- h+=fila('Total',T,'mod');$('tInv').innerHTML=h;
+ mods.forEach(function(m){var c=dn.map(function(d){return u(d,m)});c.forEach(function(x,i){T[i]+=x});
+  var subs={};W().forEach(function(w){if(w[2]==m)subs[w[3]]=1});
+  var subNames=Object.keys(subs).sort().filter(function(s){return !q||(m+' '+s).toLowerCase().indexOf(q)>=0});
+  if(!q||m.toLowerCase().indexOf(q)>=0||subNames.length){
+   filas.push(fila(m,c,'mod'));
+   subNames.forEach(function(s){filas.push(fila(s,dn.map(function(d){return u(d,m,s)})))});
+  }});
+ $('tInv').innerHTML=h+pagina('inv',filas).join('')+fila('Total',T,'mod');
  var TT=T.reduce(function(a,b){return a+b},0);
  $('kpis').innerHTML=ds.map(function(d,i){return kp(esc(corto(d.dealer))+(d.nuestro?' (nosotros)':''),T[i],'unidades en website · '+(TT?Math.round(100*T[i]/TT):0)+'% del total')}).join('')+
   dealersMarca().filter(function(d){return !d.web}).map(function(d){return kp(esc(corto(d.dealer)),'—','no publica inventario en su website')}).join('');
@@ -233,14 +238,17 @@ function vInv(){
 
 /* ---------- Comparativo ---------- */
 function vCmp(){
- var mf=$('fMod').value,ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer}),iUs=ds.findIndex(function(d){return d.nuestro});
- var keys={};W().forEach(function(w){if(!mf||w[2]==mf)keys[w[2]+'|'+w[3]]=1});keys=Object.keys(keys).sort();
+ var mf=$('fMod').value,q=$('q').value.toLowerCase(),ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer}),iUs=ds.findIndex(function(d){return d.nuestro});
+ var keys={};W().forEach(function(w){if((!mf||w[2]==mf)&&(!q||(w[2]+' '+w[3]).toLowerCase().indexOf(q)>=0))keys[w[2]+'|'+w[3]]=1});keys=Object.keys(keys).sort();
  var h='<tr><th>Sub-modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':'')+'</th>'}).join('')+'<th class="n">Dif. vs más barato</th></tr>',last='',nb=0,nc=0;
- keys.forEach(function(k){var p=k.split('|');if(p[0]!=last){h+='<tr class="mod"><td colspan="'+(ds.length+2)+'">'+esc(p[0])+'</td></tr>';last=p[0]}
+ keys.forEach(function(k){var p=k.split('|');
+  var R=dn.map(function(d){var x=W().filter(function(w){return w[0]==d&&w[2]==p[0]&&w[3]==p[1]});var pr=x.filter(function(w){return w[4]!=null}).map(function(w){return w[4]});return x.length?{n:x.length,p:pr.length?Math.min.apply(0,pr):null}:null});
+  var v=R.map(function(r){return r&&r.p}),ours=iUs>=0?v[iUs]:null,cs=v.filter(function(x,i){return i!=iUs&&x}),mc=cs.length?Math.min.apply(0,cs):null,dif=ours&&mc?ours-mc:null;
+  if(dif!=null){if(dif<=0)nb++;else nc++}});
+ pagina('cmp',keys).forEach(function(k){var p=k.split('|');if(p[0]!=last){h+='<tr class="mod"><td colspan="'+(ds.length+2)+'">'+esc(p[0])+'</td></tr>';last=p[0]}
   var R=dn.map(function(d){var x=W().filter(function(w){return w[0]==d&&w[2]==p[0]&&w[3]==p[1]});var pr=x.filter(function(w){return w[4]!=null}).map(function(w){return w[4]});return x.length?{n:x.length,p:pr.length?Math.min.apply(0,pr):null}:null});
   var v=R.map(function(r){return r&&r.p}),all=v.filter(function(x){return x}),mn=all.length?Math.min.apply(0,all):null;
   var ours=iUs>=0?v[iUs]:null,cs=v.filter(function(x,i){return i!=iUs&&x}),mc=cs.length?Math.min.apply(0,cs):null,dif=ours&&mc?ours-mc:null;
-  if(dif!=null){if(dif<=0)nb++;else nc++}
   var band=dif==null?'':dif<=0?' class="r-g"':dif<=UMBRAL?' class="r-o"':' class="r-r"';
   h+='<tr'+band+'><td>'+esc(p[1])+'</td>'+R.map(function(r){if(!r)return '<td class="n"><span class="muted">—</span></td>';
    var pr=r.p?(r.p==mn&&all.length>1?'<span class="best">'+money(r.p)+'</span>':money(r.p)):'<span class="muted">Llamar</span>';
@@ -274,11 +282,11 @@ $('csv').onclick=function(){var h,rows;
  var csv='﻿'+[h].concat(rows).map(function(r){return r.map(function(x){return '"'+String(x==null?'':x).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='competencia-'+marca.toLowerCase()+'-'+view+'.csv';document.body.appendChild(a);a.click();a.remove()};
 
-$('views').onclick=function(e){var b=e.target.closest('.view');if(!b)return;document.querySelectorAll('.view').forEach(function(x){x.classList.remove('on')});b.classList.add('on');view=b.dataset.v;PAG={meta:1,web:1,cam:1};render()};
-$('marcas').onclick=function(e){var b=e.target.closest('.tab');if(!b)return;document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});b.classList.add('on');marca=b.dataset.m;PAG={meta:1,web:1,cam:1};llenarFiltros();render()};
-function filtrar(){PAG={meta:1,web:1,cam:1};render()}
+$('views').onclick=function(e){var b=e.target.closest('.view');if(!b)return;document.querySelectorAll('.view').forEach(function(x){x.classList.remove('on')});b.classList.add('on');view=b.dataset.v;PAG={meta:1,web:1,inv:1,cmp:1,cam:1};render()};
+$('marcas').onclick=function(e){var b=e.target.closest('.tab');if(!b)return;document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});b.classList.add('on');marca=b.dataset.m;PAG={meta:1,web:1,inv:1,cmp:1,cam:1};llenarFiltros();render()};
+function filtrar(){PAG={meta:1,web:1,inv:1,cmp:1,cam:1};render()}
 ['fDeal','fMod','fTipo','fOrd','fEst','fMes'].forEach(function(i){$(i).onchange=filtrar});$('q').oninput=filtrar;
 document.addEventListener('click',function(e){var b=e.target.closest('.pager button');if(!b||b.disabled)return;PAG[b.dataset.v]=+b.dataset.p;render();
- var t={meta:'vMeta',web:'vWeb',cam:'vCam'}[b.dataset.v];$(t).scrollIntoView({behavior:'smooth',block:'start'})});
+ var t={meta:'vMeta',web:'vWeb',inv:'vInv',cmp:'vCmp',cam:'vCam'}[b.dataset.v];$(t).scrollIntoView({behavior:'smooth',block:'start'})});
 cargar();
 </script></body></html>
