@@ -28,6 +28,7 @@ th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);
 td{padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;white-space:nowrap;vertical-align:middle}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .mod td{background:#F3F4F6;font-weight:700}.us td{background:#FFF8F8}.muted{color:#9CA3AF}.hide{display:none}
 .best{background:var(--okbg);color:var(--ok);font-weight:700;border-radius:6px;padding:2px 6px}
+.lnk{color:inherit;text-decoration:none;border-bottom:1px dashed #9CA3AF}.best .lnk,.lnk.best{border-bottom-color:var(--ok)}.lnk:hover{opacity:.8}
 .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600}.up{background:#FBE9EC;color:var(--acc)}.down{background:var(--okbg);color:var(--ok)}.eq{background:#F3F4F6;color:var(--mut)}.mid{background:#FDE7C7;color:#9A4A00}
 tr.r-g td{background:#E6F4EC}tr.r-o td{background:#FFF1DC}tr.r-r td{background:#FBE3E7}
 tr.r-g td:first-child{box-shadow:inset 4px 0 #1E7F4F}tr.r-o td:first-child{box-shadow:inset 4px 0 #D97706}tr.r-r td:first-child{box-shadow:inset 4px 0 #B3122E}
@@ -164,11 +165,11 @@ function vRes(){
   var Wm=W().filter(function(w){return w[2]==m}),WC=Wm.filter(function(w){return !nuestro(w[0])}),WO=Wm.filter(function(w){return nuestro(w[0])});
   var bp=best(C,5,1),op=best(O,5,1),ba=best(C,7,1),bb=best(C,8,0),bw=best(WC,4,1),ow=best(WO,4,1);
   if(bw&&ow){if(ow[4]<=bw[4])gana++;else pierde++}
-  function c(x,i,fmt,di){return x?'<td><b>'+fmt(x[i])+'</b><span class="u">'+esc(corto(x[di]))+'</span></td>':'<td class="muted">—</td>'}
+  function c(x,i,fmt,di,ui){if(!x)return '<td class="muted">—</td>';var t='<b>'+fmt(x[i])+'</b>';return '<td>'+(x[ui]?'<a class="lnk" target="_blank" rel="noopener" href="'+esc(x[ui])+'" title="Ver en origen">'+t+' ↗</a>':t)+'<span class="u">'+esc(corto(x[di]))+'</span></td>'}
   var dif=bw&&ow?ow[4]-bw[4]:null;
   var aviso=dif==null?'<span class="muted">—</span>':dif<=0?'<span class="pill down">Somos los más bajos</span>':'<span class="pill '+(dif<=UMBRAL?'mid':'up')+'">+'+money(dif)+' vs. competencia</span>';
-  return '<tr><td><b>'+esc(m)+'</b></td>'+c(bp,5,function(v){return money(v)+'/mes'},2)+'<td>'+(op?'<b>'+money(op[5])+'/mes</b>':'<span class="muted">—</span>')+'</td>'+c(ba,7,function(v){return v+'%'},2)+c(bb,8,money,2)+
-   c(bw,4,money,0)+'<td>'+(ow?'<b>'+money(ow[4])+'</b>':'<span class="muted">—</span>')+'</td><td>'+aviso+'</td></tr>'});
+  return '<tr><td><b>'+esc(m)+'</b></td>'+c(bp,5,function(v){return money(v)+'/mes'},2,13)+'<td>'+(op?(op[13]?'<a class="lnk" target="_blank" rel="noopener" href="'+esc(op[13])+'"><b>'+money(op[5])+'/mes ↗</b></a>':'<b>'+money(op[5])+'/mes</b>'):'<span class="muted">—</span>')+'</td>'+c(ba,7,function(v){return v+'%'},2,13)+c(bb,8,money,2,13)+
+   c(bw,4,money,0,8)+'<td>'+(ow?(ow[8]?'<a class="lnk" target="_blank" rel="noopener" href="'+esc(ow[8])+'"><b>'+money(ow[4])+' ↗</b></a>':'<b>'+money(ow[4])+'</b>'):'<span class="muted">—</span>')+'</td><td>'+aviso+'</td></tr>'});
  $('tRes').innerHTML='<tr><th>Modelo</th><th>Pago más bajo<br>competencia (Meta)</th><th>Nuestro pago<br>(Meta)</th><th>APR más bajo</th><th>Bono más alto</th><th>Precio más bajo<br>competencia (web)</th><th>Nuestro precio<br>más bajo (web)</th><th>Precio web</th></tr>'+rows.join('');
  var comp=MA().filter(function(a){return !nuestro(a[2])});
  $('kpis').innerHTML=kp('Anuncios de la competencia',comp.length||'—',comp.length?'activos en Meta':'lectura de Meta aún no activada')+
@@ -248,13 +249,15 @@ function vCmp(){
   var v=R.map(function(r){return r&&r.p}),ours=iUs>=0?v[iUs]:null,cs=v.filter(function(x,i){return i!=iUs&&x}),mc=cs.length?Math.min.apply(0,cs):null,dif=ours&&mc?ours-mc:null;
   if(dif!=null){if(dif<=0)nb++;else nc++}});
  pagina('cmp',keys).forEach(function(k){var p=k.split('|');if(p[0]!=last){h+='<tr class="mod"><td colspan="'+(ds.length+2)+'">'+esc(p[0])+'</td></tr>';last=p[0]}
-  var R=dn.map(function(d){var x=W().filter(function(w){return w[0]==d&&w[2]==p[0]&&w[3]==p[1]});var pr=x.filter(function(w){return w[4]!=null}).map(function(w){return w[4]});return x.length?{n:x.length,p:pr.length?Math.min.apply(0,pr):null}:null});
+  var R=dn.map(function(d){var x=W().filter(function(w){return w[0]==d&&w[2]==p[0]&&w[3]==p[1]});var xp=x.filter(function(w){return w[4]!=null}).sort(function(a,b){return a[4]-b[4]});return x.length?{n:x.length,p:xp.length?xp[0][4]:null,mx:xp.length?xp[xp.length-1][4]:null,u:(xp[0]||x[0])[8]}:null});
   var v=R.map(function(r){return r&&r.p}),all=v.filter(function(x){return x}),mn=all.length?Math.min.apply(0,all):null;
   var ours=iUs>=0?v[iUs]:null,cs=v.filter(function(x,i){return i!=iUs&&x}),mc=cs.length?Math.min.apply(0,cs):null,dif=ours&&mc?ours-mc:null;
   var band=dif==null?'':dif<=0?' class="r-g"':dif<=UMBRAL?' class="r-o"':' class="r-r"';
   h+='<tr'+band+'><td>'+esc(p[1])+'</td>'+R.map(function(r){if(!r)return '<td class="n"><span class="muted">—</span></td>';
-   var pr=r.p?(r.p==mn&&all.length>1?'<span class="best">'+money(r.p)+'</span>':money(r.p)):'<span class="muted">Llamar</span>';
-   return '<td class="n">'+pr+'<span class="u">'+r.n+' unidad'+(r.n>1?'es':'')+'</span></td>'}).join('')+
+   var txt=r.p?money(r.p):'Llamar',lnk=r.u?'<a class="lnk" target="_blank" rel="noopener" href="'+esc(r.u)+'" title="Ver esta unidad en el website">'+txt+' ↗</a>':txt;
+   var pr=r.p?(r.p==mn&&all.length>1?'<span class="best">'+lnk+'</span>':lnk):'<span class="muted">'+lnk+'</span>';
+   var sub=r.mx&&r.mx>r.p?r.n+' uds · hasta '+money(r.mx):r.n+' unidad'+(r.n>1?'es':'');
+   return '<td class="n">'+pr+'<span class="u">'+sub+'</span></td>'}).join('')+
    '<td class="n">'+(dif==null?'<span class="muted">—</span>':dif>0?'<span class="pill '+(dif<=UMBRAL?'mid':'up')+'">+'+money(dif)+'</span>':dif<0?'<span class="pill down">−'+money(-dif)+'</span>':'<span class="pill eq">Igual</span>')+'</td></tr>'});
  $('tCmp').innerHTML=h;
  $('kpis').innerHTML=kp('Somos los más baratos',nb,'de '+(nb+nc)+' sub-modelos comparables')+kp('Estamos más caros',nc,'sub-modelos con un competidor más bajo')+
