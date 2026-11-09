@@ -24,6 +24,7 @@ select,input{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(-
 .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
 .card h3{margin:0 0 4px;font-size:14px}.card .hint{font-size:12px;color:var(--mut);margin-bottom:12px}
 .tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
+#vInv .tw,#vCmp .tw{overflow-x:hidden}#tInv th,#tCmp th{white-space:normal;padding:7px 6px}#tInv td,#tCmp td{padding:7px 6px}#tInv td:first-child,#tCmp td:first-child{white-space:normal}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:600}
 td{padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;white-space:nowrap;vertical-align:middle}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .mod td{background:#F3F4F6;font-weight:700}.us td{background:#FFF8F8}.muted{color:#9CA3AF}.hide{display:none}
@@ -109,7 +110,7 @@ function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function money(v){return v==null||v===''?'':'$'+Math.round(v).toLocaleString('en-US')}
 function pd(s){var p=String(s).split('/');return p.length==3?new Date(+p[2],p[0]-1,+p[1]):new Date(0)}
-function corto(d){return String(d).replace(/^Autocentro\s+/,'Autocentro ').replace(/\s+Nissan$|\s+Toyota$/,'').replace(/^Nissan de |^Toyota de /,'')}
+function corto(d){return String(d).replace(/^Autocentro\s+/,'Autocentro ').replace(/\s+Ponce\s*&\s*Mayag\S+/i,'').replace(/\s+Nissan$|\s+Toyota$|\s+Chrysler$|\s+Jeep\s+RAM$/i,'').replace(/\s+Chrysler\s+/i,' ').replace(/^Nissan de |^Toyota de /i,'')}
 function kp(l,v,s){return '<div class="kpi"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>'}
 function nuevo(fecha){return (pd(D.hoy)-pd(fecha))/864e5<=3}
 function dealersMarca(){return D.dealers.filter(function(d){return d.marca==marca}).sort(function(a,b){return (b.nuestro-a.nuestro)||a.dealer.localeCompare(b.dealer)})}
