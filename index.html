@@ -74,7 +74,7 @@ td.que{white-space:normal;min-width:220px;max-width:380px}
   <div class="f" id="bDeal"><label>Dealer</label><select id="fDeal"></select></div>
   <div class="f"><label>Modelo</label><select id="fMod"></select></div>
   <div class="f" id="bTipo"><label>Tipo de oferta</label><select id="fTipo"><option value="">Todas</option><option value="5">Pago mensual</option><option value="7">Tasa (APR)</option><option value="8">Bono</option><option value="6">Precio</option></select></div>
-  <div class="f" id="bEst"><label>Estado</label><select id="fEst"><option value="act" selected>Activos (vigentes + caducados)</option><option value="vig">Solo vigentes</option><option value="cad">Caducados (oferta vencida, anuncio sigue)</option><option value="term">Terminados (ya no aparecen)</option><option value="">Todos</option></select></div>
+  <div class="f" id="bEst"><label>Estado</label><select id="fEst"><option value="vig" selected>Solo vigentes</option><option value="act">Activos (vigentes + caducados)</option><option value="cad">Caducados (oferta vencida, anuncio sigue)</option><option value="term">Terminados (ya no aparecen)</option><option value="">Todos</option></select></div>
   <div class="f" id="bMes"><label>Mes publicado</label><select id="fMes"><option value="">Todos</option></select></div>
   <div class="f" id="bOrd"><label>Ordenar</label><select id="fOrd"><option value="new">Más recientes</option><option value="pay">Pago más bajo</option></select></div>
   <div class="f" style="flex:1;min-width:180px"><label>Buscar</label><input id="q" placeholder="Modelo, oferta, VIN, color…"></div>
@@ -121,7 +121,7 @@ var MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','se
 function estado(a){if(/termin/i.test(a[15]))return 'term';if(a[14]&&pd(a[14])<pd(D.hoy))return 'cad';return 'vig'}
 function mesKey(f){var p=String(f).split('/');return p.length==3?p[2]+'-'+('0'+p[0]).slice(-2):''}
 function mesTxt(k){if(!k)return 'Sin fecha';var p=k.split('-');var t=MESES[+p[1]-1]+' '+p[0];return t.charAt(0).toUpperCase()+t.slice(1)}
-function MA(){return M().filter(function(a){return estado(a)!='term'})}
+function MA(){return M().filter(function(a){return estado(a)=='vig'})}
 
 function normSub(m,raw){
  var s=String(raw||'').trim();
@@ -157,13 +157,46 @@ function normData(d){
   else if(/^sr$/i.test(m)&&/toyota/i.test(w[12])){w[3]=('SR '+String(w[3]||'')).trim();w[2]='Tacoma'}
   w[3]=normSub(w[2],w[3]);
  });
+ var extraMeta=[];
+ var knownMods=['Kicks','Rogue','Frontier','Murano','Pathfinder','Sentra','Versa','Altima','Armada','ARIYA','Corolla Cross','Grand Highlander','Land Cruiser','Corolla','RAV4','Tacoma','4Runner','Highlander','Tundra','Camry','Crown','bZ4X','Yaris','Sienna','GR86','Supra','Grand Cherokee','Wagoneer','Wrangler','Gladiator','Compass','RAM 1500','RAM 2500','Hornet','Durango','Pacifica','Charger','Challenger'];
  (d.meta||[]).forEach(function(a){
   var m=String(a[3]||'').trim();
   if(/^grand$/i.test(m))a[3]=/toyota/i.test(a[1])?'Grand Highlander':'Grand Cherokee';
   else if(/^rav$/i.test(m))a[3]='RAV4';
   else if(/^land(y)?$/i.test(m))a[3]='Land Cruiser';
   else if(/^sr$/i.test(m)&&/toyota/i.test(a[1]))a[3]='Tacoma';
+
+  // Multi-model ads expansion (e.g. Adriel Black Friday: Kicks $236, Rogue $309, Frontier $445, Murano $498)
+  var fullTxt=[a[4],a[9]].join(' ');
+  if(/^varios/i.test(m) || /(?:mens|\/mes|al mes|\$)/i.test(a[9])){
+   var found={};
+   knownMods.forEach(function(mod){
+    var re=new RegExp('(?:✅|🏷️|•|-|\\*|\\n|^|\\s)'+mod+'\\b[^$\\n\\r]{0,35}\\$\\s*([1-9]\\d{1,3})(?:\\s*(?:mens|\\/mes|al mes|mes))?','i');
+    var match=fullTxt.match(re);
+    if(match){
+     var pVal=parseInt(match[1],10);
+     if(pVal>=85 && pVal<=1500) found[mod]=pVal;
+    }
+   });
+   var fMods=Object.keys(found);
+   if(fMods.length>0){
+    fMods.forEach(function(mod,idx){
+     if(idx===0 && /^varios/i.test(m)){
+      a[3]=mod;
+      a[5]=found[mod];
+      a[4]=mod+' · $'+found[mod]+'/mes';
+     } else if(mod!==a[3] || found[mod]!==a[5]){
+      var clone=a.slice();
+      clone[3]=mod;
+      clone[5]=found[mod];
+      clone[4]=mod+' · $'+found[mod]+'/mes';
+      extraMeta.push(clone);
+     }
+    });
+   }
+  }
  });
+ if(extraMeta.length>0) d.meta=d.meta.concat(extraMeta);
 }
 function matchMod(aMod,m){var s=String(aMod||'').trim();if(s==m)return true;if(/^varios:/i.test(s))return s.replace(/^varios:\s*/i,'').split(/\s*,\s*/).indexOf(m)>=0;return false}
 function iniciar(d){
