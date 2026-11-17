@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es"><head>
+<base target="_top">
 <meta name="marca" content="Chrysler">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Competencia | Autocentro</title>
@@ -82,6 +83,7 @@ td.que{white-space:normal;min-width:220px;max-width:380px}
   <div class="f"><label>&nbsp;</label><button class="btn web" id="csv" style="padding:9px 12px">⬇ Exportar a Excel</button></div>
  </div>
  <div class="kpis" id="kpis"></div>
+ <div id="notaWeb"></div>
  <div id="vRes"><div class="card"><h3>Mejor oferta por modelo</h3><div class="hint">Lo mejor que anuncia la competencia en Meta y publica en su website, junto a lo nuestro.</div><div class="tw"><table id="tRes"></table></div></div></div>
  <div id="vMeta" class="hide"><div class="ads" id="ads"></div><div class="pager" id="pgMeta"></div></div>
  <div id="vWeb" class="hide"><div class="card"><h3>Vehículos publicados en los websites</h3><div class="hint">Cada fila abre la página de ese vehículo. En verde: el precio más bajo de ese sub-modelo entre todos los dealers. Días publicado en rojo: 60 o más.</div><div class="tw"><table id="tWeb"></table></div><div class="pager" id="pgWeb"></div></div></div>
@@ -94,13 +96,19 @@ td.que{white-space:normal;min-width:220px;max-width:380px}
 </div>
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbwAHnLcV14158WtSM7Z35wEVJ8Z1wBa0jpNCHLyJn31HpvttniCt6NQ-bXtqUGjfUS94g/exec';
-var KEY = new URLSearchParams(location.search).get('key') || '';
+var KEY = new URLSearchParams(location.search).get('key') || '51ef6c052ffd44e2';
 var MARCA = new URLSearchParams(location.search).get('marca') || (document.querySelector('meta[name=marca]') || {}).content || '';
 function cargar(){
-  fetch(API + '?page=api&key=' + encodeURIComponent(KEY) + (MARCA ? '&marca=' + encodeURIComponent(MARCA) : ''))
-    .then(function(r){ return r.json(); })
-    .then(function(d){ if (d.error) throw new Error(d.error); iniciar(d); })
-    .catch(function(e){ $('loading').textContent = 'Error al cargar: ' + e.message; });
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run.withSuccessHandler(iniciar)
+      .withFailureHandler(function(e){ $('loading').textContent = 'Error al cargar: ' + e.message; })
+      .getDatosCompetencia(KEY);
+  } else {
+    fetch(API + '?page=api&key=' + encodeURIComponent(KEY) + (MARCA ? '&marca=' + encodeURIComponent(MARCA) : ''))
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if (d.error) throw new Error(d.error); iniciar(d); })
+      .catch(function(e){ $('loading').textContent = 'Error al cargar: ' + e.message; });
+  }
 }
 var D=null, marca='', view='res', UMBRAL=500, POR=20, PAG={meta:1,web:1,inv:1,cmp:1,cam:1};
 function pagina(v,L){var tp=Math.max(1,Math.ceil(L.length/POR));if(PAG[v]>tp)PAG[v]=tp;var p=PAG[v];
@@ -226,9 +234,30 @@ function fMeta(){var d=$('fDeal').value,m=$('fMod').value,t=$('fTipo').value,q=$
 
 function render(){
  $('nMeta').textContent=MA().length;$('nWeb').textContent=W().length;$('nCam').textContent=D.cambios.filter(function(c){return c[2]==marca}).length;
+ $('notaWeb').innerHTML='';
  ['res','meta','web','inv','cmp','cam'].forEach(function(v){$('v'+v.charAt(0).toUpperCase()+v.slice(1)).classList.toggle('hide',view!=v)});
  $('bTipo').classList.toggle('hide',view!='meta');$('bEst').classList.toggle('hide',view!='meta');$('bMes').classList.toggle('hide',view!='meta');$('bOrd').classList.toggle('hide',view!='meta');$('bDeal').classList.toggle('hide',view=='res'||view=='inv'||view=='cmp');
  ({res:vRes,meta:vMeta,web:vWeb,inv:vInv,cmp:vCmp,cam:vCam})[view]();
+}
+
+function renderNotaWeb(usarFiltroDealer){
+ var df=usarFiltroDealer?$('fDeal').value:'';
+ var sin=dealersMarca().filter(function(d){return !W().some(function(w){return w[0]==d.dealer})&&(!df||d.dealer==df)});
+ var msgs=[];
+ if(sin.length){
+  var nombres=sin.map(function(d){return d.dealer}).join(' y ');
+  if(/nissan/i.test(marca)&&/adriel/i.test(nombres)){
+   msgs.push('<b>ℹ️ Nota sobre '+esc(nombres)+' (0 en Website):</b> Adriel Nissan no promociona ni publica un catálogo de inventario de unidades nuevas en su página web (<code>adrielnissan.com</code>), por lo que no es posible traer sus unidades web y únicamente se monitorean sus promociones en <b>Ofertas en Meta</b>.');
+  }else if(/chrysler/i.test(marca)){
+   msgs.push('<b>ℹ️ Nota sobre '+esc(nombres)+' (0 en Website):</b> Sus páginas web utilizan protección cerrada que no permite extraer el listado público de unidades automáticamente, por lo que no se muestran en Website y únicamente se monitorean sus promociones en <b>Ofertas en Meta</b>.');
+  }else{
+   msgs.push('<b>ℹ️ Nota sobre '+esc(nombres)+' (0 en Website):</b> No publica catálogo de inventario extraíble en su página web, por lo que únicamente se monitorean sus promociones en <b>Ofertas en Meta</b>.');
+  }
+ }
+ if(/toyota/i.test(marca)&&(!df||/calesa/i.test(df))&&W().some(function(w){return /calesa/i.test(w[0])})){
+  msgs.push('<b>ℹ️ Nota sobre Calesa Toyota (no es inventario al 100%):</b> Lo que aparece de Calesa <b>no es su inventario al 100%</b>, ya que no muestra su inventario completo en el web; únicamente publica estas unidades seleccionadas en oferta (<code>calesatoyota.com/oferta</code>).');
+ }
+ $('notaWeb').innerHTML=msgs.map(function(t){return '<div class="card" style="background:#FEF3E2;border-color:#F59E0B;padding:12px 16px;font-size:13px;color:#92400E;margin-bottom:14px">'+t+'</div>'}).join('');
 }
 
 /* ---------- Resumen ---------- */
@@ -283,23 +312,27 @@ function vMeta(){
 /* ---------- Websites ---------- */
 function minPorSub(){var m={};W().forEach(function(w){if(w[4]==null)return;var k=w[2]+'|'+w[3];if(m[k]==null||w[4]<m[k])m[k]=w[4]});return m}
 function vWeb(){
+ renderNotaWeb(true);
  var L=fWeb(),min=minPorSub();
  L.sort(function(a,b){return String(a[2]).localeCompare(String(b[2]))||String(a[3]).localeCompare(String(b[3]))||((a[4]==null?1e9:a[4])-(b[4]==null?1e9:b[4]))});
  var us=L.filter(function(w){return nuestro(w[0])}),sin=L.filter(function(w){return w[4]==null}).length,ofe=L.filter(function(w){return /oferta/i.test(w[11])}).length;
  $('kpis').innerHTML=kp('Unidades',L.length,'nuestras '+us.length+' · competencia '+(L.length-us.length))+kp('Sin precio publicado',sin,'dicen "Llamar"')+kp('Marcadas "En oferta"',ofe,'según el website')+kp('60+ días publicadas',L.filter(function(w){return !nuestro(w[0])&&w[10]>=60}).length,'de la competencia · candidatas a rebaja');
- $('tWeb').innerHTML='<tr><th></th><th>Dealer</th><th>Vehículo</th><th class="n">Precio</th><th class="n">Precio lista</th><th class="n">Descuento</th><th class="n">Días</th><th></th></tr>'+pagina('web',L).map(function(w){
+ $('tWeb').innerHTML=L.length?'<tr><th></th><th>Dealer</th><th>Vehículo</th><th class="n">Precio</th><th class="n">Precio lista</th><th class="n">Descuento</th><th class="n">Días</th><th></th></tr>'+pagina('web',L).map(function(w){
   var b=w[4]!=null&&min[w[2]+'|'+w[3]]==w[4];
   return '<tr'+(nuestro(w[0])?' class="us"':'')+'><td>'+(w[9]?'<img class="thumb" loading="lazy" src="'+esc(w[9])+'" alt="">':'')+'</td><td>'+esc(w[0])+'</td><td class="veh"><b>'+esc(w[1]+' '+w[2])+'</b> '+esc(w[3])+(/oferta/i.test(w[11])?' <span class="tag oferta">En oferta</span>':'')+'<span class="u">'+esc([w[6],w[7]].filter(function(x){return x&&x!='-'}).join(' · '))+'</span></td>'+
   '<td class="n">'+(w[4]==null?'<span class="muted">Llamar</span>':b?'<span class="best">'+money(w[4])+'</span>':money(w[4]))+'</td><td class="n muted">'+money(w[5])+'</td><td class="n">'+(w[5]&&w[4]?money(w[5]-w[4]):'')+'</td>'+
-  '<td class="n"><span class="dias'+(w[10]>=60?' old':'')+'">'+(w[10]==null?'':w[10])+'</span></td><td>'+(w[8]?'<a class="btn web" target="_blank" rel="noopener" href="'+esc(w[8])+'">Ver ↗</a>':'')+'</td></tr>'}).join('');
+  '<td class="n"><span class="dias'+(w[10]>=60?' old':'')+'">'+(w[10]==null?'':w[10])+'</span></td><td>'+(w[8]?'<a class="btn web" target="_blank" rel="noopener" href="'+esc(w[8])+'">Ver ↗</a>':'')+'</td></tr>'}).join('')
+  :($('pgWeb').innerHTML='','<tr><td class="empty">No hay unidades publicadas en website con estos filtros.</td></tr>');
 }
 
 /* ---------- Inventario ---------- */
 function vInv(){
- var mf=$('fMod').value,q=$('q').value.toLowerCase(),ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer});
+ renderNotaWeb(false);
+ var hasW=function(d){return W().some(function(w){return w[0]==d.dealer})};
+ var mf=$('fMod').value,q=$('q').value.toLowerCase(),ds=dealersMarca().filter(hasW),dn=ds.map(function(d){return d.dealer});
  function u(d,m,s){return W().filter(function(w){return w[0]==d&&w[2]==m&&(s==null||w[3]==s)}).length}
  var mods={};W().forEach(function(w){if(!mf||w[2]==mf)mods[w[2]]=1});mods=Object.keys(mods).sort();
- var T=dn.map(function(){return 0}),h='<tr><th>Modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':'')+'</th>'}).join('')+'<th class="n">Total</th><th class="n">Nuestra parte</th></tr>';
+ var T=dn.map(function(){return 0}),h='<tr><th>Modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':/calesa/i.test(d.dealer)?'<span class="u" style="color:#B45309">parcial web</span>':'')+'</th>'}).join('')+'<th class="n">Total</th><th class="n">Nuestra parte</th></tr>';
  var iUs=ds.findIndex(function(d){return d.nuestro}),filas=[];
  function fila(nombre,c,cls){var t=c.reduce(function(a,b){return a+b},0),mx=Math.max.apply(0,c),varios=c.filter(function(x){return x}).length>1;
   return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(nombre)+'</td>'+c.map(function(x){return '<td class="n'+(x==mx&&x>0&&varios?' top':'')+'">'+(x||'<span class="muted">0</span>')+'</td>'}).join('')+'<td class="n">'+t+'</td><td class="n">'+(t&&iUs>=0?Math.round(100*c[iUs]/t)+'%':'—')+'</td></tr>'}
@@ -312,15 +345,16 @@ function vInv(){
   }});
  $('tInv').innerHTML=h+pagina('inv',filas).join('')+fila('Total',T,'mod');
  var TT=T.reduce(function(a,b){return a+b},0);
- $('kpis').innerHTML=ds.map(function(d,i){return kp(esc(corto(d.dealer))+(d.nuestro?' (nosotros)':''),T[i],'unidades en website · '+(TT?Math.round(100*T[i]/TT):0)+'% del total')}).join('')+
-  dealersMarca().filter(function(d){return !d.web}).map(function(d){return kp(esc(corto(d.dealer)),'—','no publica inventario en su website')}).join('');
+ $('kpis').innerHTML=ds.map(function(d,i){var esCal=/calesa/i.test(d.dealer);return kp(esc(corto(d.dealer))+(d.nuestro?' (nosotros)':esCal?' (parcial)':''),T[i],esCal?'<span style="color:#B45309;font-weight:600">no es inventario al 100%</span> · no lo muestra en el web':'unidades en website · '+(TT?Math.round(100*T[i]/TT):0)+'% del total')}).join('')+
+  dealersMarca().filter(function(d){return !hasW(d)}).map(function(d){return kp(esc(corto(d.dealer)),'—','no publica inventario en su website')}).join('');
 }
 
 /* ---------- Comparativo ---------- */
 function vCmp(){
- var mf=$('fMod').value,q=$('q').value.toLowerCase(),ds=dealersMarca().filter(function(d){return d.web}),dn=ds.map(function(d){return d.dealer}),iUs=ds.findIndex(function(d){return d.nuestro});
+ renderNotaWeb(false);
+ var mf=$('fMod').value,q=$('q').value.toLowerCase(),ds=dealersMarca().filter(function(d){return W().some(function(w){return w[0]==d.dealer})}),dn=ds.map(function(d){return d.dealer}),iUs=ds.findIndex(function(d){return d.nuestro});
  var keys={};W().forEach(function(w){if((!mf||w[2]==mf)&&(!q||(w[2]+' '+w[3]).toLowerCase().indexOf(q)>=0))keys[w[2]+'|'+w[3]]=1});keys=Object.keys(keys).sort();
- var h='<tr><th>Sub-modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':'')+'</th>'}).join('')+'<th class="n">Dif. vs más barato</th></tr>',last='',nb=0,nc=0;
+ var h='<tr><th>Sub-modelo</th>'+ds.map(function(d){return '<th class="n">'+esc(corto(d.dealer))+(d.nuestro?'<span class="u">nosotros</span>':/calesa/i.test(d.dealer)?'<span class="u" style="color:#B45309">parcial web</span>':'')+'</th>'}).join('')+'<th class="n">Dif. vs más barato</th></tr>',last='',nb=0,nc=0;
  keys.forEach(function(k){var p=k.split('|');
   var R=dn.map(function(d){var x=W().filter(function(w){return w[0]==d&&w[2]==p[0]&&w[3]==p[1]});var pr=x.filter(function(w){return w[4]!=null}).map(function(w){return w[4]});return x.length?{n:x.length,p:pr.length?Math.min.apply(0,pr):null}:null});
   var v=R.map(function(r){return r&&r.p}),ours=iUs>=0?v[iUs]:null,cs=v.filter(function(x,i){return i!=iUs&&x}),mc=cs.length?Math.min.apply(0,cs):null,dif=ours&&mc?ours-mc:null;
